@@ -5,9 +5,7 @@ import { pool } from '../../core/utilities';
 
 const booksRouter: Router = express.Router();
 
-const getAllBooksQuery =        
-    'SELECT * FROM books';
-
+const getAllBooksQuery = 'SELECT * FROM books';
 
 //helper function to convert entry to proper format as specified in assignment document.
 const entryToBook = (entry) => {
@@ -28,10 +26,111 @@ const entryToBook = (entry) => {
         },
         icons: {
             large: entry.image_url,
-            small: entry.image_small_url
-        }
+            small: entry.image_small_url,
+        },
     };
 };
+/**
+ * @api {put} /books/update-rating Update a book's rating
+ * @apiName UpdateBookRating
+ * @apiGroup Books
+ *
+ * @apiParam {String} isbn13 ISBN-13 of the book
+ * @apiParam {Object} ratings New ratings data for the book
+ *
+ * @apiSuccess {String} message Success message
+ * @apiError {400} Invalid request parameters
+ * @apiError {404} Book not found
+ * @apiError {500} Server error
+ */
+booksRouter.put('/update-rating', (req: Request, res: Response) => {
+    const { isbn13, ratings } = req.body;
+
+    // Validate request parameters
+    if (
+        !isbn13 ||
+        !ratings ||
+        typeof ratings !== 'object' ||
+        !isValidRatingsData(ratings)
+    ) {
+        res.status(400).json({ message: 'Invalid request parameters' });
+        return;
+    }
+
+    const { average, count } = calculateAverageRating(ratings);
+
+    const values = [average, count, ...getRatingValues(ratings), isbn13];
+
+    // Update the book's ratings in the database
+    const updateQuery = `
+        UPDATE books
+        SET rating_avg = $1,
+            rating_count = $2,
+            rating_1_star = $3,
+            rating_2_star = $4,
+            rating_3_star = $5,
+            rating_4_star = $6,
+            rating_5_star = $7
+        WHERE isbn13 = $8
+    `;
+
+    pool.query(updateQuery, values)
+        .then((result) => {
+            if (result.rowCount === 0) {
+                res.status(404).json({ message: 'Book not found' });
+            } else {
+                res.json({ message: 'Book rating updated successfully' });
+            }
+        })
+        .catch((error) => {
+            console.error('DB Query error on updating book rating');
+            console.error(error);
+            res.status(500).json({ error: 'Server error - contact support' });
+        });
+});
+
+// function checking for valid ratings input (integer)
+function isValidRatingsData(ratings) {
+    return (
+        typeof ratings.average === 'number' &&
+        validRating(ratings.average === 'number') &&
+        typeof ratings.count === 'number' &&
+        typeof ratings.rating_1 === 'number' &&
+        typeof ratings.rating_2 === 'number' &&
+        typeof ratings.rating_3 === 'number' &&
+        typeof ratings.rating_4 === 'number' &&
+        typeof ratings.rating_5 === 'number'
+    );
+}
+
+// helper function to calculate the average rating and rating count
+function calculateAverageRating(ratings) {
+    const total =
+        ratings.rating_1 +
+        ratings.rating_2 * 2 +
+        ratings.rating_3 * 3 +
+        ratings.rating_4 * 4 +
+        ratings.rating_5 * 5;
+    const count =
+        ratings.rating_1 +
+        ratings.rating_2 +
+        ratings.rating_3 +
+        ratings.rating_4 +
+        ratings.rating_5;
+    const average = total / count;
+    return { average, count };
+}
+
+// helper function to return a list of ratings 1-5
+function getRatingValues(ratings) {
+    return [
+        ratings.rating_1,
+        ratings.rating_2,
+        ratings.rating_3,
+        ratings.rating_4,
+        ratings.rating_5,
+    ];
+}
 
 /**
  * @api {get} /books/all Retrieve all books with pagination
@@ -50,7 +149,7 @@ booksRouter.get('/all', (req: Request, res: Response) => {
     const page: number = parseInt(req.body.page as string) || 1;
     const limit: number = parseInt(req.body.limit as string) || 10;
     const offset: number = (page - 1) * limit;
-    const query = getAllBooksQuery +` order by isbn13 LIMIT $1 OFFSET $2`;
+    const query = getAllBooksQuery + ` order by isbn13 LIMIT $1 OFFSET $2`;
 
     pool.query(query, [limit, offset])
         .then((result) => {
@@ -61,9 +160,7 @@ booksRouter.get('/all', (req: Request, res: Response) => {
             console.error(error);
             res.status(500).json({ error: 'Server error - contact support' });
         });
-
 });
-
 
 /**
  * @api {get} /rating Retrieve books by rating
@@ -79,15 +176,15 @@ booksRouter.get('/all', (req: Request, res: Response) => {
  * @apiError {500} Server error
  */
 booksRouter.get('/rating', (request: Request, response: Response) => {
-    const theQuery =
-        getAllBooksQuery + ' WHERE rating_avg > $1';
-    
+    const theQuery = getAllBooksQuery + ' WHERE rating_avg > $1';
+
     let values;
     if (validRating(request.query.rating) && request.query.rating) {
         values = [request.query.rating];
     } else {
         response.status(400).send({
-            message: 'Invalid or missing rating  - please refer to documentation',
+            message:
+                'Invalid or missing rating  - please refer to documentation',
         });
         return;
     }
@@ -95,7 +192,7 @@ booksRouter.get('/rating', (request: Request, response: Response) => {
         .then((result) => {
             result.rows = result.rows.map(entryToBook);
             response.send({
-                books: result.rows
+                books: result.rows,
             });
         })
         .catch((error) => {
@@ -112,26 +209,27 @@ const validRating = (rating) => {
     return rating >= 1 && rating <= 5;
 };
 
-
-
 /**
  * @api {get} /pub_year Retrieve book by Publication Year
  * @apiName GetBooksByPublicationYear
- * 
+ *
  * @apiGroup Books
- * 
+ *
  * @apiQuery {Number} year Year of the book
- * 
+ *
  * @apiSuccess {IBook[]} books Array of IBook objects above a certain year
  * @apiError {400} Invalid or missing year
  * @apiError {401} Invalid or missing Token
  * @apiError {403} Invalid or missing Authorization
  * @apiError {500} Server error
  */
-booksRouter.get("/pub_year", (request: Request, response: Response) => {
-    const theQuery = getAllBooksQuery + " WHERE publication_year = $1";
+booksRouter.get('/pub_year', (request: Request, response: Response) => {
+    const theQuery = getAllBooksQuery + ' WHERE publication_year = $1';
     let values;
-    if (isValidYear(parseInt(request.query.year as string)) && request.query.year) {
+    if (
+        isValidYear(parseInt(request.query.year as string)) &&
+        request.query.year
+    ) {
         values = [request.query.year];
     } else {
         response.status(400).send({
@@ -144,7 +242,7 @@ booksRouter.get("/pub_year", (request: Request, response: Response) => {
         .then((result) => {
             result.rows = result.rows.map(entryToBook);
             response.send({
-                books: result.rows
+                books: result.rows,
             });
         })
         .catch((error) => {
@@ -155,10 +253,14 @@ booksRouter.get("/pub_year", (request: Request, response: Response) => {
                 message: 'server error - contact support',
             });
         });
-})
+});
 
 const isValidYear = (year) => {
-    return year.toString().length === 4 && year > 0 && year <= new Date().getFullYear();
+    return (
+        year.toString().length === 4 &&
+        year > 0 &&
+        year <= new Date().getFullYear()
+    );
 };
 
 // "return" the router
