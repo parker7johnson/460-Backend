@@ -159,7 +159,91 @@ booksRouter.get("/pub_year", (request: Request, response: Response) => {
 
 const isValidYear = (year) => {
     return year.toString().length === 4 && year > 0 && year <= new Date().getFullYear();
-};
+}
+
+
+
+/**
+ * @api {get} /books/authors Retrieve books by Author
+ * @apiName GetBooksByAuthor
+ * @apiGroup Books
+ * @apiQuery {String} author Author's name
+ * @apiSuccess {IBook[]} books Array of IBook objects written by the author
+ * @apiError {400} Invalid or missing author
+ * @apiError {401} Invalid or missing Token
+ * @apiError {403} Invalid or missing Authorization
+ * @apiError {500} Server error
+ */
+booksRouter.get("/authors", (request: Request, response: Response) => {
+    const authorName: string = request.query.author as string;
+
+    if (!authorName) {
+        response.status(400).send({
+            message: 'Invalid or missing author name - please refer to documentation',
+        });
+        return;
+    }
+
+    const theQuery = getAllBooksQuery + " WHERE authors ILIKE $1";
+    const partialAuthorName = `%${authorName}%`; // Partial match for author's name
+
+    pool.query(theQuery, [partialAuthorName])
+        .then((result) => {
+            result.rows = result.rows.map(entryToBook);
+            response.send({
+                books: result.rows
+            });
+        })
+        .catch((error) => {
+            // Log the error
+            console.error('DB Query error on GET by authors');
+            console.error(error);
+            response.status(500).send({
+                message: 'Server error - contact support',
+            });
+        });
+});
+
+/**
+ * @api {get} /books/title Retrieve books by title
+ * @apiName GetBooksByTitle
+ * @apiGroup Books
+ * @apiQuery {String} title title of the book
+ * @apiSuccess {IBook[]} books Array of IBook objects with titles containing the provided partial title
+ * @apiError {400} Invalid or missing title
+ * @apiError {401} Invalid or missing Token
+ * @apiError {403} Invalid or missing Authorization
+ * @apiError {500} Server error
+ */
+
+booksRouter.get("/title", (request: Request, response: Response) => {
+    const partialTitle: string = request.query.title as string;
+
+    if (!partialTitle) {
+        response.status(400).send({
+            message: 'Invalid or missing title - please refer to documentation',
+        });
+        return;
+    }
+
+    const theQuery = getAllBooksQuery + " WHERE title ILIKE $1";
+    const partialTitleParam = `%${partialTitle}%`;
+
+    pool.query(theQuery, [partialTitleParam])
+        .then((result) => {
+            result.rows = result.rows.map(entryToBook);
+            response.send({
+                books: result.rows
+            });
+        })
+        .catch((error) => {
+            console.error('DB Query error on GET by title');
+            console.error(error);
+            response.status(500).send({
+                message: 'Server error - contact support',
+            });
+        });
+});
 
 // "return" the router
 export { booksRouter };
