@@ -170,10 +170,10 @@ booksRouter.get('/all', (req: Request, res: Response) => {
  * @apiQuery {Number} [rating] Rating of the book
  *
  * @apiSuccess {IBook[]} books Array of IBook objects above a certain rating
- * @apiError {400} Invalid or missing rating
- * @apiError {401} Invalid or missing Token
- * @apiError {403} Invalid or missing Authorization
- * @apiError {500} Server error
+ * @apiError (400 : Invalid or missing Rating) {String} Invalid or missing rating- please refer to documentation
+ * @apiError (401 : Invalid or missing Token) {String} Invalid or missing Token
+ * @apiError (403 : Invalid or missing Authorization) {String} Invalid or missing Authorization
+ * @apiError (500 : Server error) {String} server error - contact support
  */
 booksRouter.get('/rating', (request: Request, response: Response) => {
     const theQuery = getAllBooksQuery + ' WHERE rating_avg > $1';
@@ -218,10 +218,10 @@ const validRating = (rating) => {
  * @apiQuery {Number} year Year of the book
  *
  * @apiSuccess {IBook[]} books Array of IBook objects above a certain year
- * @apiError {400} Invalid or missing year
- * @apiError {401} Invalid or missing Token
- * @apiError {403} Invalid or missing Authorization
- * @apiError {500} Server error
+ * @apiError (400 : Invalid or missing Year) {String} Invalid or missing year
+ * @apiError (401 : Invalid or missing Token) {String} Invalid or missing Token
+ * @apiError (403 : Invalid or missing Authorization) {String} Invalid or missing Authorization
+ * @apiError (500 : Server error) {String} server error - contact support
  */
 booksRouter.get('/pub_year', (request: Request, response: Response) => {
     const theQuery = getAllBooksQuery + ' WHERE publication_year = $1';
@@ -263,6 +263,53 @@ const isValidYear = (year) => {
     );
 };
 
+
+/**
+ * @api {delete} /multiple_delete Delete multiple books by ISBN13
+ * @apiName DeleteMultipleBooks
+ *
+ * @apiGroup Books
+ * 
+ * @apiBody {Array} isbn13s Array of isbn13s as strings
+ *
+ * @apiSuccess {Number} numDeleted The number of books deleted
+ * @apiError (400 : Invalid request body) {String} Invalid request body - please refer to documentation
+ * @apiError (400 : Invalid ISBN13 inrequest body) {String} Invalid ISBN13 inrequest body - please refer to documentation
+ * @apiError (401 : Invalid or missing Token)
+ * @apiError (403 : Invalid or missing Authorization) 
+ * @apiError (500 : Server error) {String} server error - contact support
+ */
+booksRouter.delete("/multiple_delete", (req: Request, res: Response) => {
+    const { isbn13s } = req.body;
+    if (!isbn13s || !Array.isArray(isbn13s)) {
+        res.status(400).json({ message: "Invalid request body - please refer to documentation" });
+        return;
+    }
+    let invalidISBN = false;
+    isbn13s.forEach((isbn13) => {
+        if (!isbn13 || typeof isbn13 !== "string" || isbn13.length !== 13) {
+            invalidISBN = true;
+        }
+    })
+
+    if (invalidISBN) {
+        res.status(400).json({ message: "Invalid ISBN13 in request body - please refer to documentation" });
+        return;
+    }
+    const query = "delete from books where isbn13 = any($1)";
+    pool.query(query, [isbn13s])
+        .then((result) => {
+            res.send({
+                numDeleted: result.rowCount
+            });
+        })
+        .catch((error) => {
+            //log the error
+            console.error('DB Query error on delete');
+            console.error(error);
+            res.status(500).json({ error: 'Server error - contact support' });
+        });
+});
 
 
 /**
