@@ -274,6 +274,7 @@ const isValidYear = (year) => {
  *
  * @apiSuccess {Number} numDeleted The number of books deleted
  * @apiError (400 : Invalid request body) {String} Invalid request body - please refer to documentation
+ * @apiError (400 : Invalid ISBN13 inrequest body) {String} Invalid ISBN13 inrequest body - please refer to documentation
  * @apiError (401 : Invalid or missing Token)
  * @apiError (403 : Invalid or missing Authorization) 
  * @apiError (500 : Server error) {String} server error - contact support
@@ -282,6 +283,17 @@ booksRouter.delete("/multiple_delete", (req: Request, res: Response) => {
     const { isbn13s } = req.body;
     if (!isbn13s || !Array.isArray(isbn13s)) {
         res.status(400).json({ message: "Invalid request body - please refer to documentation" });
+        return;
+    }
+    let invalidISBN = false;
+    isbn13s.forEach((isbn13) => {
+        if (!isbn13 || typeof isbn13 !== "string" || isbn13.length !== 13) {
+            invalidISBN = true;
+        }
+    })
+
+    if (invalidISBN) {
+        res.status(400).json({ message: "Invalid ISBN13 in request body - please refer to documentation" });
         return;
     }
     const query = "delete from books where isbn13 = any($1)";
