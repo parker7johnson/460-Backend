@@ -1,0 +1,966 @@
+{
+	"info": {
+		"_postman_id": "aaf2e1bf-b998-4a0a-b904-b941062b63b6",
+		"name": "Books",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "27763409"
+	},
+	"item": [
+		{
+			"name": "Rating Tests",
+			"item": [
+				{
+					"name": "valid rating request",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const bookKeys = ['isbn13', 'authors', 'publication', 'original_title', 'title', 'ratings', 'icons'];",
+									"const ratingKeys = [\"average\", \"count\", \"rating_1\", \"rating_2\", \"rating_3\", \"rating_4\", \"rating_5\"]",
+									"const urlKeys = ['large', 'small'];",
+									"const response = pm.response.json();",
+									"pm.test(\"Body has books field\", () => {",
+									"    pm.expect(response).to.haveOwnProperty(\"books\");",
+									"})",
+									"response.books.forEach(entry => {",
+									"    pm.test('Entry matches IBook interface', () => {",
+									"        bookKeys.forEach(key => {",
+									"            pm.expect(entry).to.have.property(key);",
+									"        });",
+									"    });",
+									"",
+									"    pm.test('Ratings object has required keys', () => {",
+									"        pm.expect(entry.ratings).to.have.all.keys(ratingKeys);",
+									"    });",
+									"",
+									"    pm.test('Icons object has required keys', () => {",
+									"        pm.expect(entry.icons).to.have.all.keys(urlKeys);",
+									"    });",
+									"",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_signed}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/books/rating?rating=4.5",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"books",
+								"rating"
+							],
+							"query": [
+								{
+									"key": "rating",
+									"value": "4.5"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "rating server error",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"",
+									"//Only works when database container is not running but the nodemon container is.",
+									"pm.test(\"Server Error\", () => {",
+									"    pm.response.to.have.status(500)",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_signed}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/books/rating?rating=2",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"books",
+								"rating"
+							],
+							"query": [
+								{
+									"key": "rating",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "invalid rating query < 1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json()",
+									"",
+									"pm.test(\"Invalid Priority Less then Accepted Value\", () => {",
+									"    pm.response.to.have.status(400)",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_signed}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/books/rating?rating=0",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"books",
+								"rating"
+							],
+							"query": [
+								{
+									"key": "rating",
+									"value": "0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "invalid rating query > 5",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"",
+									"pm.test(\"Invalide Priorty above allowed value\", () => {",
+									"    pm.response.to.have.status(400);",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_signed}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/books/rating?rating=6",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"books",
+								"rating"
+							],
+							"query": [
+								{
+									"key": "rating",
+									"value": "6"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "missing query param",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"",
+									"pm.test(\"Invalide Priorty above allowed value\", () => {",
+									"    pm.response.to.have.status(400);",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_signed}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/books/rating",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"books",
+								"rating"
+							],
+							"query": [
+								{
+									"key": "rating",
+									"value": "6",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "No Token Provided",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json()",
+									"",
+									"pm.test(\"Auth Token not supplied\", () => {",
+									"    pm.expect(response).to.haveOwnProperty(\"success\");",
+									"    pm.expect(response).to.haveOwnProperty(\"message\");",
+									"",
+									"});",
+									"",
+									"pm.test(\"Auth Token not supplied\", () => {",
+									"    pm.expect(response).property(\"success\").to.equal(false);",
+									"    pm.expect(response).property(\"message\").to.equal(\"Auth token is not supplied\");",
+									"});",
+									"",
+									"pm.test(\"Code should be 401\", () => {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/books/rating?rating=4.5",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"books",
+								"rating"
+							],
+							"query": [
+								{
+									"key": "rating",
+									"value": "4.5"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Publication Year Tests",
+			"item": [
+				{
+					"name": "valid pub year request",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const bookKeys = ['isbn13', 'authors', 'publication', 'original_title', 'title', 'ratings', 'icons'];",
+									"const ratingKeys = [\"average\", \"count\", \"rating_1\", \"rating_2\", \"rating_3\", \"rating_4\", \"rating_5\"]",
+									"const urlKeys = ['large', 'small'];",
+									"const response = pm.response.json();",
+									"pm.test(\"Body has books field\", () => {",
+									"    pm.expect(response).to.haveOwnProperty(\"books\");",
+									"})",
+									"response.books.forEach(entry => {",
+									"    pm.test('Entry matches IBook interface', () => {",
+									"        bookKeys.forEach(key => {",
+									"            pm.expect(entry).to.have.property(key);",
+									"        });",
+									"    });",
+									"",
+									"    pm.test('Ratings object has required keys', () => {",
+									"        pm.expect(entry.ratings).to.have.all.keys(ratingKeys);",
+									"    });",
+									"",
+									"    pm.test('Icons object has required keys', () => {",
+									"        pm.expect(entry.icons).to.have.all.keys(urlKeys);",
+									"    });",
+									"",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/books/pub_year?year=1798",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"books",
+								"pub_year"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "1798"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "No Token Provided",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json()",
+									"",
+									"pm.test(\"Auth Token not supplied\", () => {",
+									"    pm.expect(response).to.haveOwnProperty(\"success\");",
+									"    pm.expect(response).to.haveOwnProperty(\"message\");",
+									"",
+									"});",
+									"",
+									"pm.test(\"Auth Token not supplied\", () => {",
+									"    pm.expect(response).property(\"success\").to.equal(false);",
+									"    pm.expect(response).property(\"message\").to.equal(\"Auth token is not supplied\");",
+									"});",
+									"",
+									"pm.test(\"Code should be 401\", () => {",
+									"    pm.response.to.have.status(401);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/books/pub_year?year=1798",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"books",
+								"pub_year"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "1798"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "rating server error Copy",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_signed}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/books/pub_year?year=2009",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"books",
+								"pub_year"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2009"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "invalid year query < 0",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json()",
+									"",
+									"pm.test(\"Invalid Priority Less then Accepted Value\", () => {",
+									"    pm.response.to.have.status(400)",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_signed}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/books/rating?year=0",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"books",
+								"rating"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "invalid year query > current year",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"",
+									"pm.test(\"Invalide Priorty above allowed value\", () => {",
+									"    pm.response.to.have.status(400);",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_signed}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/books/rating?year=2025",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"books",
+								"rating"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2025"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "missing query param",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"",
+									"pm.test(\"Invalide Priorty above allowed value\", () => {",
+									"    pm.response.to.have.status(400);",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_signed}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/books/rating",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"books",
+								"rating"
+							],
+							"query": [
+								{
+									"key": "year",
+									"value": "2024",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Tests the end point /books/pub_year to ensure that all the entries are valid."
+		},
+		{
+			"name": "Delete Series of Books",
+			"item": [
+				{
+					"name": "Successful Delete Request",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"Successful Request\", () => {",
+									"    pm.expect(response).to.haveOwnProperty(\"numDeleted\");",
+									"    pm.expect(response).property(\"numDeleted\").to.equal(0);",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"isbn13s\" : [\n        \"9780739326220\",\n        \"9781612130290\"\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/books/multiple_delete",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"books",
+								"multiple_delete"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "No Token Provided",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json()",
+									"",
+									"pm.test(\"Auth Token not supplied\", () => {",
+									"    pm.expect(response).to.haveOwnProperty(\"success\");",
+									"    pm.expect(response).to.haveOwnProperty(\"message\");",
+									"",
+									"});",
+									"",
+									"pm.test(\"Auth Token not supplied\", () => {",
+									"    pm.expect(response).property(\"success\").to.equal(false);",
+									"    pm.expect(response).property(\"message\").to.equal(\"Auth token is not supplied\");",
+									"});",
+									"",
+									"pm.test(\"Code should be 401\", () => {",
+									"    pm.response.to.have.status(401);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"isbn13s\" : [\n        \"9780739326220\",\n        \"9781612130290\"\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/books/multiple_delete",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"books",
+								"multiple_delete"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"Token Avaliable\", () => {",
+									"    pm.expect(response).to.haveOwnProperty(\"accessToken\");",
+									"});",
+									"",
+									"pm.collectionVariables.set(\"jwt_signed\", response.accessToken);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstname\" : \"{{$randomFirstName}}\",\n    \"lastname\" : \"{{$randomLastName}}\",\n    \"email\" : \"{{$randomEmail}}\",\n    \"password\" : \"{{$randomPassword}}\",\n    \"username\" : \"{{$randomUserName}}\",\n    \"role\" : \"1\",\n    \"phone\" : \"{{$randomPhoneNumber}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"Token Avaliable\", () => {",
+									"    pm.expect(response).to.haveOwnProperty(\"accessToken\");",
+									"});",
+									"",
+									"pm.test(\"Correct Status Code\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"parker7johnson@hotmail.com\",\n    \"password\": \"parkerjohnson\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login Missing Email",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"Token Avaliable\", () => {",
+									"    pm.expect(response).to.haveOwnProperty(\"message\");",
+									"});",
+									"",
+									"pm.test(\"Missing Email\" , () => {",
+									"    pm.expect(response).property(\"message\").to.equal(\"Missing required information\");",
+									"})",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"password\": \"parkerjohnson\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login Missing Password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"Token Avaliable\", () => {",
+									"    pm.expect(response).to.haveOwnProperty(\"message\");",
+									"});",
+									"",
+									"pm.test(\"Missing Email\" , () => {",
+									"    pm.expect(response).property(\"message\").to.equal(\"Missing required information\");",
+									"})",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"parker7johnson@hotmail.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "jwt_signed",
+			"value": ""
+		}
+	]
+}

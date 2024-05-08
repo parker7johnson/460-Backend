@@ -14,7 +14,6 @@ import {
 } from '../../core/utilities';
 
 const isStringProvided = validationFunctions.isStringProvided;
-const isNumberProvided = validationFunctions.isNumberProvided;
 const generateHash = credentialingFunctions.generateHash;
 const generateSalt = credentialingFunctions.generateSalt;
 
@@ -143,7 +142,7 @@ registerRouter.post(
     },
     (request: IUserRequest, response: Response, next: NextFunction) => {
         const theQuery =
-            'INSERT INTO Account(firstname, lastname, username, email, phone, create_date, account_role) VALUES ($1, $2, $3, $4, $5, NOW(), $6) RETURNING account_id';
+            'INSERT INTO Account(firstname, lastname, username, email, phone, account_role) VALUES ($1, $2, $3, $4, $5, $6) RETURNING account_id';
         const values = [
             request.body.firstname,
             request.body.lastname,
@@ -225,19 +224,5 @@ registerRouter.post(
             });
     }
 );
-
-registerRouter.get('/hash_demo', (request, response) => {
-    const password = 'password12345';
-
-    const salt = generateSalt(32);
-    const saltedHash = generateHash(password, salt);
-    const unsaltedHash = generateHash(password, '');
-
-    response.status(200).send({
-        salt: salt,
-        salted_hash: saltedHash,
-        unsalted_hash: unsaltedHash,
-    });
-});
 
 export { registerRouter };
