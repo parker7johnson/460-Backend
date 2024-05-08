@@ -93,7 +93,7 @@ booksRouter.put('/update-rating', (req: Request, res: Response) => {
 function isValidRatingsData(ratings) {
     return (
         typeof ratings.average === 'number' &&
-        validRating(ratings.average === 'number') &&
+        validRating(ratings.average) &&
         typeof ratings.count === 'number' &&
         typeof ratings.rating_1 === 'number' &&
         typeof ratings.rating_2 === 'number' &&
@@ -263,44 +263,48 @@ const isValidYear = (year) => {
     );
 };
 
-
 /**
  * @api {delete} /multiple_delete Delete multiple books by ISBN13
  * @apiName DeleteMultipleBooks
  *
  * @apiGroup Books
- * 
+ *
  * @apiBody {Array} isbn13s Array of isbn13s as strings
  *
  * @apiSuccess {Number} numDeleted The number of books deleted
  * @apiError (400 : Invalid request body) {String} Invalid request body - please refer to documentation
  * @apiError (400 : Invalid ISBN13 inrequest body) {String} Invalid ISBN13 inrequest body - please refer to documentation
  * @apiError (401 : Invalid or missing Token)
- * @apiError (403 : Invalid or missing Authorization) 
+ * @apiError (403 : Invalid or missing Authorization)
  * @apiError (500 : Server error) {String} server error - contact support
  */
-booksRouter.delete("/multiple_delete", (req: Request, res: Response) => {
+booksRouter.delete('/multiple_delete', (req: Request, res: Response) => {
     const { isbn13s } = req.body;
     if (!isbn13s || !Array.isArray(isbn13s)) {
-        res.status(400).json({ message: "Invalid request body - please refer to documentation" });
+        res.status(400).json({
+            message: 'Invalid request body - please refer to documentation',
+        });
         return;
     }
     let invalidISBN = false;
     isbn13s.forEach((isbn13) => {
-        if (!isbn13 || typeof isbn13 !== "string" || isbn13.length !== 13) {
+        if (!isbn13 || typeof isbn13 !== 'string' || isbn13.length !== 13) {
             invalidISBN = true;
         }
-    })
+    });
 
     if (invalidISBN) {
-        res.status(400).json({ message: "Invalid ISBN13 in request body - please refer to documentation" });
+        res.status(400).json({
+            message:
+                'Invalid ISBN13 in request body - please refer to documentation',
+        });
         return;
     }
-    const query = "delete from books where isbn13 = any($1)";
+    const query = 'delete from books where isbn13 = any($1)';
     pool.query(query, [isbn13s])
         .then((result) => {
             res.send({
-                numDeleted: result.rowCount
+                numDeleted: result.rowCount,
             });
         })
         .catch((error) => {
@@ -310,7 +314,6 @@ booksRouter.delete("/multiple_delete", (req: Request, res: Response) => {
             res.status(500).json({ error: 'Server error - contact support' });
         });
 });
-
 
 /**
  * @api {get} /books/authors Retrieve books by Author
@@ -323,24 +326,25 @@ booksRouter.delete("/multiple_delete", (req: Request, res: Response) => {
  * @apiError {403} Invalid or missing Authorization
  * @apiError {500} Server error
  */
-booksRouter.get("/authors", (request: Request, response: Response) => {
+booksRouter.get('/authors', (request: Request, response: Response) => {
     const authorName: string = request.query.author as string;
 
     if (!authorName) {
         response.status(400).send({
-            message: 'Invalid or missing author name - please refer to documentation',
+            message:
+                'Invalid or missing author name - please refer to documentation',
         });
         return;
     }
 
-    const theQuery = getAllBooksQuery + " WHERE authors ILIKE $1";
+    const theQuery = getAllBooksQuery + ' WHERE authors ILIKE $1';
     const partialAuthorName = `%${authorName}%`; // Partial match for author's name
 
     pool.query(theQuery, [partialAuthorName])
         .then((result) => {
             result.rows = result.rows.map(entryToBook);
             response.send({
-                books: result.rows
+                books: result.rows,
             });
         })
         .catch((error) => {
@@ -365,7 +369,7 @@ booksRouter.get("/authors", (request: Request, response: Response) => {
  * @apiError {500} Server error
  */
 
-booksRouter.get("/title", (request: Request, response: Response) => {
+booksRouter.get('/title', (request: Request, response: Response) => {
     const partialTitle: string = request.query.title as string;
 
     if (!partialTitle) {
@@ -375,14 +379,14 @@ booksRouter.get("/title", (request: Request, response: Response) => {
         return;
     }
 
-    const theQuery = getAllBooksQuery + " WHERE title ILIKE $1";
+    const theQuery = getAllBooksQuery + ' WHERE title ILIKE $1';
     const partialTitleParam = `%${partialTitle}%`;
 
     pool.query(theQuery, [partialTitleParam])
         .then((result) => {
             result.rows = result.rows.map(entryToBook);
             response.send({
-                books: result.rows
+                books: result.rows,
             });
         })
         .catch((error) => {
@@ -393,8 +397,6 @@ booksRouter.get("/title", (request: Request, response: Response) => {
             });
         });
 });
-
- 
 
 // "return" the router
 export { booksRouter };
