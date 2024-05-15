@@ -498,5 +498,59 @@ booksRouter.get('/title', (request: Request, response: Response) => {
         });
 });
 
-// "return" the router
+
+
+
+/*
+@api {post} /books/add books 
+*/
+
+booksRouter.post('/add', (request: Request, response: Response) => {
+    const {
+        isbn13,
+        authors,
+        publication_year,
+        original_title,
+        title,
+        rating_avg,
+        rating_count,
+        rating_1_star,
+        rating_2_star,
+        rating_3_star,
+        rating_4_star,
+        rating_5_star,
+        image_url,
+        image_small_url
+    } = request.body;
+
+    // Validate the request body
+    if (!isbn13 || !authors || !publication_year || !original_title || !title || !rating_avg || !rating_count || !rating_1_star || !rating_2_star || !rating_3_star || !rating_4_star || !rating_5_star || !image_url || !image_small_url) {
+        return res.status(400).json({ error: 'Invalid or missing data' });
+    }
+
+    const query = `
+        INSERT INTO books (
+            isbn13, authors, publication_year, original_title, title, rating_avg, rating_count, 
+            rating_1_star, rating_2_star, rating_3_star, rating_4_star, rating_5_star, image_url, image_small_url
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+    `;
+
+    const values = [
+        isbn13, authors, publication_year, original_title, title, rating_avg, rating_count,
+        rating_1_star, rating_2_star, rating_3_star, rating_4_star, rating_5_star, image_url, image_small_url
+    ];
+
+    pool.query(query, values)
+        .then(() => {
+            console.log('Book added successfully');
+            response.status(201).json({ message: 'Book added successfully' });
+        })
+        .catch((error) => {
+            console.error('DB Query error on INSERT book');
+            console.error(error);
+            response.status(500).json({ error: 'Server error - contact support' });
+        });
+});
+
+
 export { booksRouter };
