@@ -7,6 +7,16 @@ const booksRouter: Router = express.Router();
 
 const getAllBooksQuery = 'SELECT * FROM books';
 
+const getBooksByISBNQuery = `
+    SELECT 
+    TITLE, 
+    AUTHORS, 
+    PUBLICATION_YEAR, 
+    ORIGINAL_TITLE, 
+    RATING_AVG, IMAGE_URL, 
+    IMAGE_SMALL_URL 
+    FROM BOOKS WHERE ISBN13 = `;
+
 //helper function to convert entry to proper format as specified in assignment document.
 const entryToBook = (entry) => {
     return {
@@ -158,7 +168,48 @@ booksRouter.get('/all', (req: Request, res: Response) => {
         .catch((error) => {
             console.error('DB Query error on GET all');
             console.error(error);
-            res.status(500).json({ error: 'Server error - contact support' });
+            res.status(500).json({
+                error: 'Server error - contact support please',
+            });
+        });
+});
+
+/**
+ * @api {get} /books/bookByISBN get book by specific ISBN
+ * @apiName GetBookByISBN
+ * @apiGroup Books
+ * @apiQuery {String} isbn13 Book's ISBN
+ * @apiSuccess {IBook[]} books Array of IBook objects
+ * @apiError {401} Invalid or missing Token
+ * @apiError {403} Invalid or missing Authorization
+ * @apiError {500} Server error
+ */
+booksRouter.get('/ISBN', (req: Request, res: Response) => {
+    const isbn13: string = req.query.isbn as string;
+    if (!isbn13 || isbn13.length != 13) {
+        res.status(400).send({
+            message: 'Invalid or missing ISBN - please refer to documentation',
+        });
+        return;
+    }
+
+    const theQuery = getBooksByISBNQuery + `$1 ;`;
+    const isbn = `${isbn13}`;
+
+    pool.query(theQuery, [isbn])
+        .then((result) => {
+            result.rows = result.rows.map(entryToBook);
+            res.send({
+                books: result.rows,
+            });
+        })
+        .catch((error) => {
+            // Log the error
+            console.error('DB Query error on GET by ISBN');
+            console.error(error);
+            res.status(500).send({
+                message: 'Server error - contact support',
+            });
         });
 });
 
@@ -262,6 +313,55 @@ const isValidYear = (year) => {
         year <= new Date().getFullYear()
     );
 };
+
+/**
+ * @api {delete} /delete Delete one book by ISBN13
+ * @apiName DeleteBookByISBN
+ *
+ * @apiGroup Books
+ *
+ * @apiBody isbn13 is isbn13 as string
+ *
+ * @apiSuccess {Number} numDeleted The number of books deleted
+ * @apiError (400 : Invalid request body) {String} Invalid request body - please refer to documentation
+ * @apiError (400 : Invalid ISBN13 inrequest body) {String} Invalid ISBN13 inrequest body - please refer to documentation
+ * @apiError (401 : Invalid or missing Token)
+ * @apiError (403 : Invalid or missing Authorization)
+ * @apiError (500 : Server error) {String} server error - contact support
+ */
+booksRouter.delete('/delete', (req: Request, res: Response) => {
+    const isbn13 = req.body;
+    if (!isbn13) {
+        res.status(400).json({
+            message: 'Invalid request body - please refer to documentation',
+        });
+        return;
+    }
+    let invalidISBN = false;
+    if (!isbn13 || typeof isbn13 !== 'string' || isbn13.length !== 13) {
+        invalidISBN = true;
+    }
+    if (invalidISBN) {
+        res.status(400).json({
+            message:
+                'Invalid ISBN13 in request body - please refer to documentation',
+        });
+        return;
+    }
+    const query = 'delete from books where isbn13 = any($1)';
+    pool.query(query, isbn13)
+        .then((result) => {
+            res.send({
+                numDeleted: result.rowCount,
+            });
+        })
+        .catch((error) => {
+            //log the error
+            console.error('DB Query error on delete');
+            console.error(error);
+            res.status(500).json({ error: 'Server error - contact support' });
+        });
+});
 
 /**
  * @api {delete} /multiple_delete Delete multiple books by ISBN13
