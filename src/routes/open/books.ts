@@ -562,56 +562,77 @@ booksRouter.get('/title', (request: Request, response: Response) => {
 
 
 
-// /*
-// @api {post} /books/add books 
-// */
+/**
+ * @api {post} /books/add Add a book to the database
+ * @apiName AddBook
+ * @apiGroup Books
+ *
+ * @apiParam {Number} isbn13 ISBN-13 of the book
+ * @apiParam {String} authors Authors of the book
+ * @apiParam {Number} publication_year Publication year of the book
+ * @apiParam {String} original_title Original title of the book
+ * @apiParam {String} title Title of the book
+ * @apiParam {Number} rating_avg Average rating of the book
+ * @apiParam {Number} rating_count Total count of ratings for the book
+ * @apiParam {Number} rating_1_star Number of 1-star ratings
+ * @apiParam {Number} rating_2_star Number of 2-star ratings
+ * @apiParam {Number} rating_3_star Number of 3-star ratings
+ * @apiParam {Number} rating_4_star Number of 4-star ratings
+ * @apiParam {Number} rating_5_star Number of 5-star ratings
+ * @apiParam {String} image_url URL of the book's image
+ * @apiParam {String} image_small_url URL of the small-sized book's image
+ *
+ * @apiSuccess {String} message Success message
+ * @apiError {400} Invalid request parameters
+ * @apiError {500} Server error
+ */
 
-// booksRouter.post('/add', (request: Request, response: Response) => {
-//     const {
-//         isbn13,
-//         authors,
-//         publication_year,
-//         original_title,
-//         title,
-//         rating_avg,
-//         rating_count,
-//         rating_1_star,
-//         rating_2_star,
-//         rating_3_star,
-//         rating_4_star,
-//         rating_5_star,
-//         image_url,
-//         image_small_url
-//     } = request.body;
 
-//     // Validate the request body
-//     if (!isbn13 || !authors || !publication_year || !original_title || !title || !rating_avg || !rating_count || !rating_1_star || !rating_2_star || !rating_3_star || !rating_4_star || !rating_5_star || !image_url || !image_small_url) {
-//         return res.status(400).json({ error: 'Invalid or missing data' });
-//     }
+booksRouter.post('/add', (request: Request, response: Response) => {
+    const {
+        isbn13,
+        authors,
+        publication_year,
+        original_title,
+        title,
+        rating_avg,
+        rating_count,
+        rating_1_star,
+        rating_2_star,
+        rating_3_star,
+        rating_4_star,
+        rating_5_star,
+        image_url,
+        image_small_url
+    } = request.body;
 
-//     const query = `
-//         INSERT INTO books (
-//             isbn13, authors, publication_year, original_title, title, rating_avg, rating_count, 
-//             rating_1_star, rating_2_star, rating_3_star, rating_4_star, rating_5_star, image_url, image_small_url
-//         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
-//     `;
+    // Validate the request body
+    if (!isbn13 || !authors || !publication_year || !original_title || !title || !rating_avg || !rating_count || !rating_1_star || !rating_2_star || !rating_3_star || !rating_4_star || !rating_5_star || !image_url || !image_small_url) {
+        return response.status(400).json({ error: 'Invalid or missing data' });
+    }
 
-//     const values = [
-//         isbn13, authors, publication_year, original_title, title, rating_avg, rating_count,
-//         rating_1_star, rating_2_star, rating_3_star, rating_4_star, rating_5_star, image_url, image_small_url
-//     ];
+    const query = `
+        INSERT INTO books (
+            isbn13, authors, publication_year, original_title, title, rating_avg, rating_count, 
+            rating_1_star, rating_2_star, rating_3_star, rating_4_star, rating_5_star, image_url, image_small_url
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+    `;
 
-//     pool.query(query, values)
-//         .then(() => {
-//             console.log('Book added successfully');
-//             response.status(201).json({ message: 'Book added successfully' });
-//         })
-//         .catch((error) => {
-//             console.error('DB Query error on INSERT book');
-//             console.error(error);
-//             response.status(500).json({ error: 'Server error - contact support' });
-//         });
-// });
+    const values = [
+        isbn13, authors, publication_year, original_title, title, rating_avg, rating_count,
+        rating_1_star, rating_2_star, rating_3_star, rating_4_star, rating_5_star, image_url, image_small_url
+    ];
 
+    pool.query(query, values)
+        .then(() => {
+            console.log('Book added successfully');
+            response.status(201).json({ message: 'Book added successfully' });
+        })
+        .catch((error) => {
+            console.error('DB Query error on INSERT book');
+            console.error(error);
+            response.status(500).json({ error: 'Server error - contact support' });
+        });
+});
 
 export { booksRouter };
