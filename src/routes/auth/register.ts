@@ -35,7 +35,7 @@ const isValidPassword = (password: string): boolean => {
 // Add more/your own phone number validation here. The *rules* must be documented
 // and the client-side validation should match these rules.
 const isValidPhone = (phone: string): boolean => {
-    const regex = /\(\d{3}\)[- ]?\d{3}[- ]?\d{4}/;
+    const regex = /(\(206\)|206)[- ]?\d{3}[- ]?\d{4}/;
     return regex.test(phone) && isStringProvided(phone) && phone.length == 10;
 };
 // Add more/your own role validation here. The *rules* must be documented
@@ -74,8 +74,14 @@ const emailMiddlewareCheck = (
 /**
  * @api {post} /register Request to register a user
  *
- * @apiDescription Document this route. !**Document the password rules here**!
- * !**Document the role rules here**!
+ * @apiDescription Document this route. 
+ * Password Must follow the following rules:
+ * Contains at least one lowercase letter.
+ * Contains at least one uppercase letter.
+ * Contains at least one digit.
+ * Contains at least one special character from the set !@#$%^&*()_+=-.
+ * Does not contain a sequence of four or more consecutive lowercase letters.
+ * Is at least 10 characters long.
  *
  * @apiName PostAuth
  * @apiGroup Auth
@@ -87,6 +93,7 @@ const emailMiddlewareCheck = (
  * @apiBody {String} username a username *unique
  * @apiBody {String} role a role for this user [1-5]
  * @apiBody {String} phone a phone number for this user
+ * 
  *
  * @apiSuccess (Success 201) {string} accessToken a newly created JWT
  * @apiSuccess (Success 201) {number} id unique user id
