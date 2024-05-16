@@ -420,7 +420,7 @@ booksRouter.post('/add', (request: Request, response: Response) => {
 
     // Validate the request body
     if (!isbn13 || !authors || !publication_year || !original_title || !title || !rating_avg || !rating_count || !rating_1_star || !rating_2_star || !rating_3_star || !rating_4_star || !rating_5_star || !image_url || !image_small_url) {
-        return res.status(400).json({ error: 'Invalid or missing data' });
+        return response.status(400).json({ error: 'Invalid or missing data' });
     }
 
     const query = `
