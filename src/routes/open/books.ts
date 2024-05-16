@@ -396,10 +396,30 @@ booksRouter.get("/title", (request: Request, response: Response) => {
 
 
 
-/*
-@api {post} /books/add Retrieve books by title
-*/
-
+/**
+ * @api {post} /books/add Add a book to the database
+ * @apiName AddBook
+ * @apiGroup Books
+ *
+ * @apiParam {Number} isbn13 ISBN-13 of the book
+ * @apiParam {String} authors Authors of the book
+ * @apiParam {Number} publication_year Publication year of the book
+ * @apiParam {String} original_title Original title of the book
+ * @apiParam {String} title Title of the book
+ * @apiParam {Number} rating_avg Average rating of the book
+ * @apiParam {Number} rating_count Total count of ratings for the book
+ * @apiParam {Number} rating_1_star Number of 1-star ratings
+ * @apiParam {Number} rating_2_star Number of 2-star ratings
+ * @apiParam {Number} rating_3_star Number of 3-star ratings
+ * @apiParam {Number} rating_4_star Number of 4-star ratings
+ * @apiParam {Number} rating_5_star Number of 5-star ratings
+ * @apiParam {String} image_url URL of the book's image
+ * @apiParam {String} image_small_url URL of the small-sized book's image
+ *
+ * @apiSuccess {String} message Success message
+ * @apiError {400} Invalid request parameters
+ * @apiError {500} Server error
+ */
 booksRouter.post('/add', (request: Request, response: Response) => {
     const {
         isbn13,
@@ -446,8 +466,6 @@ booksRouter.post('/add', (request: Request, response: Response) => {
             response.status(500).json({ error: 'Server error - contact support' });
         });
 });
-
-
 
 
 // "return" the router
