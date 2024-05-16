@@ -35,7 +35,7 @@ const isValidPassword = (password: string): boolean => {
 // Add more/your own phone number validation here. The *rules* must be documented
 // and the client-side validation should match these rules.
 const isValidPhone = (phone: string): boolean => {
-    const regex = /(\(206\)|206)[- ]?\d{3}[- ]?\d{4}/;
+    const regex = /\(\d{3}\)[- ]?\d{3}[- ]?\d{4}/;
     return regex.test(phone) && isStringProvided(phone) && phone.length == 10;
 };
 // Add more/your own role validation here. The *rules* must be documented
