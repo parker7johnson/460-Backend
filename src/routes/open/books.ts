@@ -330,7 +330,8 @@ const isValidYear = (year) => {
  * @apiError (500 : Server error) {String} server error - contact support
  */
 booksRouter.delete('/delete', (req: Request, res: Response) => {
-    const isbn13 = req.body;
+    const isbn13 = req.body.isbn13;
+    //const isbn13: string = req.query.isbn as string;
     if (!isbn13) {
         res.status(400).json({
             message: 'Invalid request body - please refer to documentation',
@@ -338,7 +339,7 @@ booksRouter.delete('/delete', (req: Request, res: Response) => {
         return;
     }
     let invalidISBN = false;
-    if (!isbn13 || typeof isbn13 !== 'string' || isbn13.length !== 13) {
+    if (!isbn13) {
         invalidISBN = true;
     }
     if (invalidISBN) {
@@ -348,8 +349,8 @@ booksRouter.delete('/delete', (req: Request, res: Response) => {
         });
         return;
     }
-    const query = 'delete from books where isbn13 = any($1)';
-    pool.query(query, isbn13)
+    const query = 'delete from books where isbn13 = $1';
+    pool.query(query, [isbn13])
         .then((result) => {
             res.send({
                 numDeleted: result.rowCount,
