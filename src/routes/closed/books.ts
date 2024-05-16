@@ -146,8 +146,8 @@ function getRatingValues(ratings) {
  * @apiError {500} Server error
  */
 booksRouter.get('/all', (req: Request, res: Response) => {
-    const page: number = parseInt(req.body.page as string) || 1;
-    const limit: number = parseInt(req.body.limit as string) || 10;
+    const page: number = parseInt(req.query.page as string) || 1;
+    const limit: number = parseInt(req.query.limit as string) || 10000;
     const offset: number = (page - 1) * limit;
     const query = getAllBooksQuery + ` order by isbn13 LIMIT $1 OFFSET $2`;
 
