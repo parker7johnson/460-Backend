@@ -41,6 +41,66 @@ const entryToBook = (entry) => {
     };
 };
 /**
+ * @api {put} /books/update-rating/:id Update a book's rating by ID
+ * @apiName UpdateBookRatingById
+ * @apiGroup Books
+ *
+ * @apiParam {String} id ID of the book to update
+ * @apiParam {Object} ratings New ratings data for the book
+ *
+ * @apiSuccess {String} message Success message
+ * @apiError {400} Invalid request parameters
+ * @apiError {404} Book not found
+ * @apiError {500} Server error
+ */
+booksRouter.put('/update-rating/:id', (req: Request, res: Response) => {
+    const { id } = req.params; // Get book ID from URL parameter
+    const { ratings } = req.body;
+
+    // Validate request parameters
+    if (
+        !id ||
+        !ratings ||
+        typeof ratings !== 'object' ||
+        !isValidRatingsData(ratings)
+    ) {
+        res.status(400).json({ message: 'Invalid request parameters' });
+        return;
+    }
+
+    const { average, count } = calculateAverageRating(ratings);
+
+    const values = [average, count, ...getRatingValues(ratings), id];
+
+    // Update the book's ratings in the database by ID
+    const updateQuery = `
+        UPDATE books
+        SET rating_avg = $1,
+            rating_count = $2,
+            rating_1_star = $3,
+            rating_2_star = $4,
+            rating_3_star = $5,
+            rating_4_star = $6,
+            rating_5_star = $7
+        WHERE id = $8
+    `;
+
+    pool.query(updateQuery, values)
+        .then((result) => {
+            if (result.rowCount === 0) {
+                res.status(404).json({ message: 'Book not found' });
+            } else {
+                res.json({ message: 'Book rating updated successfully' });
+            }
+        })
+        .catch((error) => {
+            console.error('DB Query error on updating book rating');
+            console.error(error);
+            res.status(500).json({ error: 'Server error - contact support' });
+        });
+});
+
+/**
  * @api {put} /books/update-rating Update a book's rating
  * @apiName UpdateBookRating
  * @apiGroup Books
@@ -156,8 +216,8 @@ function getRatingValues(ratings) {
  * @apiError {500} Server error
  */
 booksRouter.get('/all', (req: Request, res: Response) => {
-    const page: number = parseInt(req.body.page as string) || 1;
-    const limit: number = parseInt(req.body.limit as string) || 10;
+    const page: number = parseInt(req.query.page as string) || 1;
+    const limit: number = parseInt(req.query.limit as string) || 10000;
     const offset: number = (page - 1) * limit;
     const query = getAllBooksQuery + ` order by isbn13 LIMIT $1 OFFSET $2`;
 
@@ -330,7 +390,8 @@ const isValidYear = (year) => {
  * @apiError (500 : Server error) {String} server error - contact support
  */
 booksRouter.delete('/delete', (req: Request, res: Response) => {
-    const isbn13 = req.body;
+    const isbn13 = req.body.isbn13;
+    //const isbn13: string = req.query.isbn as string;
     if (!isbn13) {
         res.status(400).json({
             message: 'Invalid request body - please refer to documentation',
@@ -338,7 +399,7 @@ booksRouter.delete('/delete', (req: Request, res: Response) => {
         return;
     }
     let invalidISBN = false;
-    if (!isbn13 || typeof isbn13 !== 'string' || isbn13.length !== 13) {
+    if (!isbn13) {
         invalidISBN = true;
     }
     if (invalidISBN) {
@@ -348,8 +409,8 @@ booksRouter.delete('/delete', (req: Request, res: Response) => {
         });
         return;
     }
-    const query = 'delete from books where isbn13 = any($1)';
-    pool.query(query, isbn13)
+    const query = 'delete from books where isbn13 = $1';
+    pool.query(query, [isbn13])
         .then((result) => {
             res.send({
                 numDeleted: result.rowCount,
