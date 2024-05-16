@@ -41,6 +41,7 @@ CREATE TABLE BOOKS (
     rating_5_star INT,
     image_url TEXT,
     image_small_url TEXT
+    
 );
 
 -- Optionally, set the owner of the sequence to ensure it is owned by the table's column
