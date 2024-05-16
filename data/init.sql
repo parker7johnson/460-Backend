@@ -22,6 +22,10 @@ CREATE TABLE Account_Credential (Credential_ID SERIAL PRIMARY KEY,
                       salt VARCHAR(255),
                       FOREIGN KEY(Account_ID) REFERENCES Account(Account_ID)
 );
+
+
+
+-- Create the sequence with the desired starting value
 CREATE SEQUENCE books_id_seq START 9416;
 
 -- Create the table using the sequence
@@ -41,11 +45,12 @@ CREATE TABLE BOOKS (
     rating_5_star INT,
     image_url TEXT,
     image_small_url TEXT
-    
+
 );
 
 -- Optionally, set the owner of the sequence to ensure it is owned by the table's column
 ALTER SEQUENCE books_id_seq OWNED BY books.id;
+
 
 COPY books
 FROM '/docker-entrypoint-initdb.d/books.csv'

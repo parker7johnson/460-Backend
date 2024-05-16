@@ -14,7 +14,6 @@ import {
 } from '../../core/utilities';
 
 const isStringProvided = validationFunctions.isStringProvided;
-const isNumberProvided = validationFunctions.isNumberProvided;
 const generateHash = credentialingFunctions.generateHash;
 const generateSalt = credentialingFunctions.generateSalt;
 
@@ -24,16 +23,21 @@ export interface IUserRequest extends Request {
     id: number;
 }
 
+
 // Add more/your own password validation here. The *rules* must be documented
 // and the client-side validation should match these rules.
-const isValidPassword = (password: string): boolean =>
-    isStringProvided(password) && password.length > 7;
+const isValidPassword = (password: string): boolean => {
+    const regex =
+        /(?!.*[a-z]{4})(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+=-])[\w!@#$%^&*()-_+=]{10,}/;
+    return regex.test(password) && isStringProvided(password);
+};
 
 // Add more/your own phone number validation here. The *rules* must be documented
 // and the client-side validation should match these rules.
-const isValidPhone = (phone: string): boolean =>
-    isStringProvided(phone) && phone.length >= 10;
-
+const isValidPhone = (phone: string): boolean => {
+    const regex = /(\(206\)|206)[- ]?\d{3}[- ]?\d{4}/;
+    return regex.test(phone) && isStringProvided(phone) && phone.length == 10;
+};
 // Add more/your own role validation here. The *rules* must be documented
 // and the client-side validation should match these rules.
 const isValidRole = (priority: string): boolean =>
@@ -43,8 +47,13 @@ const isValidRole = (priority: string): boolean =>
 
 // Add more/your own email validation here. The *rules* must be documented
 // and the client-side validation should match these rules.
-const isValidEmail = (email: string): boolean =>
-    isStringProvided(email) && email.includes('@');
+const isValidEmail = (email: string): boolean => {
+    // Define the regex pattern using regex literal syntax
+    const regex = /[a-zA-Z0-9-~_+]+@[a-zA-Z]+(\.(com|edu|net))+/;
+
+    // Test if the email matches the regex pattern and is provided
+    return regex.test(email) && isStringProvided(email);
+};
 
 // middleware functions may be defined elsewhere!
 const emailMiddlewareCheck = (
@@ -143,7 +152,7 @@ registerRouter.post(
     },
     (request: IUserRequest, response: Response, next: NextFunction) => {
         const theQuery =
-            'INSERT INTO Account(firstname, lastname, username, email, phone, create_date, account_role) VALUES ($1, $2, $3, $4, $5, NOW(), $6) RETURNING account_id';
+            'INSERT INTO Account(firstname, lastname, username, email, phone, account_role) VALUES ($1, $2, $3, $4, $5, $6) RETURNING account_id';
         const values = [
             request.body.firstname,
             request.body.lastname,
@@ -225,19 +234,5 @@ registerRouter.post(
             });
     }
 );
-
-registerRouter.get('/hash_demo', (request, response) => {
-    const password = 'password12345';
-
-    const salt = generateSalt(32);
-    const saltedHash = generateHash(password, salt);
-    const unsaltedHash = generateHash(password, '');
-
-    response.status(200).send({
-        salt: salt,
-        salted_hash: saltedHash,
-        unsalted_hash: unsaltedHash,
-    });
-});
 
 export { registerRouter };

@@ -32,7 +32,8 @@ const key = {
  * @apiName GetAuth
  * @apiGroup Auth
  *
- * @apiHeader {String} authorization "username:password" uses Basic Auth
+ * @apiBody {String} email a users email
+ * @apiBody {String} password a users password
  *
  * @apiSuccess {String} accessToken JSON Web Token
  * @apiSuccess {number} id unique user id
@@ -58,10 +59,10 @@ signinRouter.post(
         }
     },
     (request: AuthRequest, response: Response) => {
-        const theQuery = `SELECT salted_hash, salt, Account_Credential.account_id, account.email, account.firstname, account.lastname, account.phone, account.username, account.account_role, account.create_date FROM Account_Credential
-                      INNER JOIN Account ON
-                      Account_Credential.account_id=Account.account_id 
-                      WHERE Account.email=$1`;
+        const theQuery = `SELECT salted_hash, salt, Account_Credential.account_id, account.email, account.firstname, account.lastname, account.phone, account.username, account.account_role FROM account_credential
+                      INNER JOIN account ON
+                      account_credential.account_id=account.account_id 
+                      WHERE account.email=$1`;
         const values = [request.body.email];
         pool.query(theQuery, values)
             .then((result) => {
