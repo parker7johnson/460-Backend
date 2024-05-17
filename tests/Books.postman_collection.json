@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "aaf2e1bf-b998-4a0a-b904-b941062b63b6",
+		"_postman_id": "0a817301-d249-479e-b4ed-e9d6d1ca4d66",
 		"name": "Books",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "27763409"
+		"_exporter_id": "34333926"
 	},
 	"item": [
 		{
@@ -821,8 +821,7 @@
 						"header": [
 							{
 								"key": "",
-								"value": "",
-								"type": "text"
+								"value": ""
 							}
 						],
 						"body": {
@@ -875,8 +874,7 @@
 						"header": [
 							{
 								"key": "",
-								"value": "",
-								"type": "text"
+								"value": ""
 							}
 						],
 						"body": {
@@ -929,8 +927,7 @@
 						"header": [
 							{
 								"key": "",
-								"value": "",
-								"type": "text"
+								"value": ""
 							}
 						],
 						"body": {
@@ -949,6 +946,245 @@
 							],
 							"path": [
 								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "update ratings",
+			"item": [
+				{
+					"name": "update by isbn13 (default) fail > 5",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();\r",
+									"pm.test(\"Response status should be 400\", () => {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"pm.test(\"Body has the field entries\", () => {\r",
+									"    pm.expect(response).to.haveOwnProperty(\"message\");\r",
+									"    pm.expect(response.message).to.equal(\"Invalid request parameters\");\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"isbn13\": \"195170342\",\r\n  \"ratings\": {\r\n    \"average\": 10,\r\n    \"count\": 1000,\r\n    \"rating_1\": 0,\r\n    \"rating_2\": 0,\r\n    \"rating_3\": 0,\r\n    \"rating_4\": 0,\r\n    \"rating_5\": 350\r\n  }\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/books/update-rating",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"books",
+								"update-rating"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update by isbn13 (default)success",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Response status should be 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"})\r",
+									"pm.test(\"Response time is less than 200ms\", () => {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(200);\r",
+									"});\r",
+									"pm.test(\"Average should be at least zero and at most 5.\", \r",
+									"    pm.expect(response.ratings).to.lessThan(5)\r",
+									");\r",
+									"pm.test(\"Body has the field entries\", () => {\r",
+									"    pm.expect(response).to.haveOwnProperty(\"entry\");\r",
+									"    pm.expect(response.entry).to.equal(\"{2} - [\" + pm.variables.replaceIn(\"{{name}}\") + \"] says: \" + pm.variables.replaceIn(\"{{msg}}\"));\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"isbn13\": \"195170342\",\r\n  \"ratings\": {\r\n    \"average\": 7,\r\n    \"count\": 1000,\r\n    \"rating_1\": 100,\r\n    \"rating_2\": 100,\r\n    \"rating_3\": 200,\r\n    \"rating_4\": 300,\r\n    \"rating_5\": 350\r\n  }\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/books/update-rating",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"books",
+								"update-rating"
+							],
+							"query": [
+								{
+									"key": "isbn13",
+									"value": "195170342",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update book by id fail > 5",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"ratings\": {\r\n    \"average\": 4,\r\n    \"count\": 1000,\r\n    \"rating_1\": 0,\r\n    \"rating_2\": 0,\r\n    \"rating_3\": 20,\r\n    \"rating_4\": 0,\r\n    \"rating_5\": 350\r\n  }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/books/update-rating/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"books",
+								"update-rating",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update book by id success",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"ratings\": {\r\n    \"average\": 4,\r\n    \"count\": 1000,\r\n    \"rating_1\": 0,\r\n    \"rating_2\": 0,\r\n    \"rating_3\": 20,\r\n    \"rating_4\": 0,\r\n    \"rating_5\": 350\r\n  }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/books/update-rating/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"books",
+								"update-rating",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "get books pagination",
+			"item": [
+				{
+					"name": "get all books",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();",
+									"",
+									"pm.test(\"Response status should be 200\", () => {",
+									"    pm.response.to.have.status(200);",
+									"})",
+									"",
+									"pm.test(\"Body has the field entries\", () => {",
+									"    pm.expect(response).to.haveOwnProperty(\"entries\");",
+									"    console.log(response.entries.length);",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/message/all",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"message",
+								"all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get 2 books pagination",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/books/all?page=1&limit=30",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"books",
+								"all"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "30"
+								}
 							]
 						}
 					},
