@@ -14,6 +14,6 @@ import { booksRouter } from './books';
 
 const openRoutes: Router = express.Router();
 
-// openRoutes.use('/books', booksRouter);
+ openRoutes.use('/books', booksRouter);
 
 export { openRoutes };
