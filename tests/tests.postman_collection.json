@@ -1,0 +1,164 @@
+{
+	"info": {
+		"_postman_id": "6ceb59e4-9b89-4cd7-aa24-0298b93d35a9",
+		"name": "tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34354996"
+	},
+	"item": [
+		{
+			"name": "http://localhost:4000/books/authors?author=ally Carter",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"status code is 200\" , () =>{",
+							"    pm.response.to.have.status(200);",
+							"})",
+							"",
+							"pm.test(\"Response should be an array of books\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('books');",
+							"    pm.expect(jsonData.books).to.be.an('array');",
+							"});",
+							"",
+							"pm.test(\"Each book should have the necessary properties\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    jsonData.books.forEach(function (book) {",
+							"        pm.expect(book).to.have.property('isbn13');",
+							"        pm.expect(book).to.have.property('authors');",
+							"        pm.expect(book).to.have.property('publication');",
+							"        pm.expect(book).to.have.property('original_title');",
+							"        pm.expect(book).to.have.property('title');",
+							"        pm.expect(book).to.have.property('ratings');",
+							"        pm.expect(book).to.have.property('icons');",
+							"",
+							"    });",
+							"});",
+							"",
+							"",
+							"pm.sendRequest({",
+							"    url: 'http://localhost:4000/books/authors?author',",
+							"    method: 'GET',",
+							"    header: {",
+							"        'Simulate-Server-Error': 'true'/",
+							"    },",
+							"    params: {",
+							"        author: 'Jk. Rowling'",
+							"    }",
+							"}, function (err, res) {",
+							"    if (err) {",
+							"        console.error(err);",
+							"    } else {",
+							"        pm.test(\"Status code is 400 on missing author\", function () {",
+							"            pm.expect(res).to.have.status(400);",
+							"        });",
+							"    }",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:4000/books/authors?author=ally Carter",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"books",
+						"authors"
+					],
+					"query": [
+						{
+							"key": "author",
+							"value": "ally Carter"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:4000/books/title?title=Heist Society (Heist Society, #1)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response should contain books array\",() =>{",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('books');",
+							"    pm.expect(jsonData.books).to.be.an('array');",
+							"});",
+							"",
+							"pm.test(\"Books array should not be empty\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.books.length).to.be.greaterThan(0);",
+							"});",
+							"",
+							"",
+							"",
+							"pm.sendRequest({",
+							"    url: 'http://localhost:4000/books/title?title',",
+							"    method: 'GET',",
+							"    header: {",
+							"        'Simulate-Server-Error': 'true' /",
+							"    },",
+							"    params: {",
+							"       ",
+							"    }",
+							"}, function (err, res) {",
+							"    if (err) {",
+							"        console.error(err);",
+							"    } else {",
+							"        pm.test(\"Status code is 400 on missing author\", function () {",
+							"            pm.expect(res).to.have.status(400);",
+							"        });",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:4000/books/title?title=Heist Society (Heist Society, #1)",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4000",
+					"path": [
+						"books",
+						"title"
+					],
+					"query": [
+						{
+							"key": "title",
+							"value": "Heist Society (Heist Society, "
+						}
+					],
+					"hash": "1)"
+				}
+			},
+			"response": []
+		}
+	]
+}
