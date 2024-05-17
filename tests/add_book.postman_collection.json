@@ -1,0 +1,202 @@
+{
+	"info": {
+		"_postman_id": "43bace8b-639e-4e09-a072-423f37fb60fe",
+		"name": "book2",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "27763409"
+	},
+	"item": [
+		{
+			"name": "Add a Book",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const body = pm.response.json();",
+							"",
+							"pm.test(\"Status code is 201\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response should be JSON\", () => {",
+							"    pm.response.to.be.json;",
+							"});",
+							"",
+							"pm.test(\"Response contains success message\",  () => {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"message\");",
+							"    pm.expect(jsonData.message).to.equal(\"Book added successfully\");",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt_signed}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"isbn13\": 9783161484100,\n  \"authors\": \"John Doe, Jane Smith\",\n  \"publication_year\": 2020,\n  \"original_title\": \"Original Book Title\",\n  \"title\": \"Book Title\",\n  \"rating_avg\": 4.5,\n  \"rating_count\": 200,\n  \"rating_1_star\": 5,\n  \"rating_2_star\": 10,\n  \"rating_3_star\": 20,\n  \"rating_4_star\": 50,\n  \"rating_5_star\": 115,\n  \"image_url\": \"http://example.com/image.jpg\",\n  \"image_small_url\": \"http://example.com/image_small.jpg\"\n}\n\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/books/add",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"books",
+						"add"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add a Book 400",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const body = pm.response.json();",
+							"",
+							"pm.test(\"Status code is 201\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response should be JSON\", () => {",
+							"    pm.response.to.be.json;",
+							"});",
+							"",
+							"pm.test(\"Response contains success message\",  () => {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"message\");",
+							"    pm.expect(jsonData.message).to.equal(\"Book added successfully\");",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt_signed}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"isbn13\": 9783161484100,\n  \"authors\": \"John Doe, Jane Smith\",\n  \"publication_year\": 2020,\n  \"original_title\": \"Original Book Title\",\n  \"title\": \"Book Title\",\n  \"rating_avg\": 4.5,\n  \"rating_count\": 200,\n  \"rating_1_star\": 5,\n  \"rating_2_star\": 10,\n  \"rating_3_star\": 20,\n  \"rating_4_star\": 50,\n  \"rating_5_star\": 115,\n  \"image_url\": \"http://example.com/image.jpg\",\n  \"image_small_url\": \"http://example.com/image_small.jpg\"\n}\n\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/books/add",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"books",
+						"add"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add a Book 500",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const body = pm.response.json();",
+							"",
+							"pm.test(\"Status code is 201\", () => {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response should be JSON\", () => {",
+							"    pm.response.to.be.json;",
+							"});",
+							"",
+							"pm.test(\"Response contains success message\",  () => {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"message\");",
+							"    pm.expect(jsonData.message).to.equal(\"Book added successfully\");",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt_signed}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"isbn13\": 9783161484100,\n  \"authors\": \"John Doe, Jane Smith\",\n  \"publication_year\": 2020,\n  \"original_title\": \"Original Book Title\",\n  \"title\": \"Book Title\",\n  \"rating_avg\": 4.5,\n  \"rating_count\": 200,\n  \"rating_1_star\": 5,\n  \"rating_2_star\": 10,\n  \"rating_3_star\": 20,\n  \"rating_4_star\": 50,\n  \"rating_5_star\": 115,\n  \"image_url\": \"http://example.com/image.jpg\",\n  \"image_small_url\": \"http://example.com/image_small.jpg\"\n}\n\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/books/add",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"books",
+						"add"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

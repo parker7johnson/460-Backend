@@ -582,9 +582,9 @@ booksRouter.get('/title', (request: Request, response: Response) => {
  * @apiParam {String} image_url URL of the book's image
  * @apiParam {String} image_small_url URL of the small-sized book's image
  *
- * @apiSuccess {String} message Success message
- * @apiError {400} Invalid request parameters
- * @apiError {500} Server error
+ * @apiSuccess (201: Book Added) {String} message Success message
+ * @apiError (400: Invalid Request Parameters) {String} Invalid request parameters
+ * @apiError (500: Server Error) {String} Server error
  */
 
 
