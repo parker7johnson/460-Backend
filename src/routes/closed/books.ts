@@ -278,7 +278,7 @@ booksRouter.get('/ISBN', (req: Request, res: Response) => {
  * @apiName GetBooksByRating
  * @apiGroup Books
  *
- * @apiQuery {Number} [rating] Rating of the book
+ * @apiQuery {Number} rating Rating of the book
  *
  * @apiSuccess {IBook[]} books Array of IBook objects above a certain rating
  * @apiError (400 : Invalid or missing Rating) {String} Invalid or missing rating- please refer to documentation
