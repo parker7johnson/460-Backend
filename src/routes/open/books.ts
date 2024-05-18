@@ -211,9 +211,9 @@ function getRatingValues(ratings) {
  * @apiBody {Number} [limit=10] Number of books per page (default is 10)
  *
  * @apiSuccess {IBook[]} books Array of IBook objects
- * @apiError {401} Invalid or missing Token
- * @apiError {403} Invalid or missing Authorization
- * @apiError {500} Server error
+ * @apiError (401 : Invalid or missing Token) {String} Invalid or missing Token
+ * @apiError (403 : Invalid or missing Authorization) {String} Invalid or missing Authorization
+ * @apiError (500 : Server error) {String} server error - contact support
  */
 booksRouter.get('/all', (req: Request, res: Response) => {
     const page: number = parseInt(req.query.page as string) || 1;
@@ -235,14 +235,15 @@ booksRouter.get('/all', (req: Request, res: Response) => {
 });
 
 /**
- * @api {get} /books/bookByISBN get book by specific ISBN
+ * @api {get} /books/ISBN get book by specific ISBN
  * @apiName GetBookByISBN
  * @apiGroup Books
  * @apiQuery {String} isbn13 Book's ISBN
  * @apiSuccess {IBook[]} books Array of IBook objects
- * @apiError {401} Invalid or missing Token
- * @apiError {403} Invalid or missing Authorization
- * @apiError {500} Server error
+ * @apiError (400: Missing ISBN) {String} Invalid or missing ISBN - please refer to documentation
+ * @apiError (401 : Invalid or missing Token) {String} Invalid or missing Token
+ * @apiError (403 : Invalid or missing Authorization) {String} Invalid or missing Authorization
+ * @apiError (500 : Server error) {String} server error - contact support
  */
 booksRouter.get('/ISBN', (req: Request, res: Response) => {
     const isbn13: string = req.query.isbn as string;
@@ -253,7 +254,7 @@ booksRouter.get('/ISBN', (req: Request, res: Response) => {
         return;
     }
 
-    const theQuery = getBooksByISBNQuery + `$1 ;`;
+    const theQuery = getAllBooksQuery + ` WHERE isbn13 = $1 ;`;
     const isbn = `${isbn13}`;
 
     pool.query(theQuery, [isbn])
@@ -385,8 +386,8 @@ const isValidYear = (year) => {
  * @apiSuccess {Number} numDeleted The number of books deleted
  * @apiError (400 : Invalid request body) {String} Invalid request body - please refer to documentation
  * @apiError (400 : Invalid ISBN13 inrequest body) {String} Invalid ISBN13 inrequest body - please refer to documentation
- * @apiError (401 : Invalid or missing Token)
- * @apiError (403 : Invalid or missing Authorization)
+ * @apiError (401 : Invalid or missing Token) {String} Invalid or missing Token
+ * @apiError (403 : Invalid or missing Authorization) {String} Invalid or missing Authorization
  * @apiError (500 : Server error) {String} server error - contact support
  */
 booksRouter.delete('/delete', (req: Request, res: Response) => {
@@ -435,8 +436,8 @@ booksRouter.delete('/delete', (req: Request, res: Response) => {
  * @apiSuccess {Number} numDeleted The number of books deleted
  * @apiError (400 : Invalid request body) {String} Invalid request body - please refer to documentation
  * @apiError (400 : Invalid ISBN13 inrequest body) {String} Invalid ISBN13 inrequest body - please refer to documentation
- * @apiError (401 : Invalid or missing Token)
- * @apiError (403 : Invalid or missing Authorization)
+ * @apiError (401 : Invalid or missing Token) {String} Invalid or missing Token
+ * @apiError (403 : Invalid or missing Authorization) {String} Invalid or missing Authorization
  * @apiError (500 : Server error) {String} server error - contact support
  */
 booksRouter.delete('/multiple_delete', (req: Request, res: Response) => {
@@ -482,10 +483,10 @@ booksRouter.delete('/multiple_delete', (req: Request, res: Response) => {
  * @apiGroup Books
  * @apiQuery {String} author Author's name
  * @apiSuccess {IBook[]} books Array of IBook objects written by the author
- * @apiError {400} Invalid or missing author
- * @apiError {401} Invalid or missing Token
- * @apiError {403} Invalid or missing Authorization
- * @apiError {500} Server error
+ * @apiError (400 : Invalid or missing author) {String} Invalid or missing author
+ * @apiError (401 : Invalid or missing Token) {String} Invalid or missing Token
+ * @apiError (403 : Invalid or missing Authorization) {String} Invalid or missing Authorization
+ * @apiError (500 : Server error) {String} server error - contact support
  */
 booksRouter.get('/authors', (request: Request, response: Response) => {
     const authorName: string = request.query.author as string;
@@ -524,10 +525,10 @@ booksRouter.get('/authors', (request: Request, response: Response) => {
  * @apiGroup Books
  * @apiQuery {String} title title of the book
  * @apiSuccess {IBook[]} books Array of IBook objects with titles containing the provided partial title
- * @apiError {400} Invalid or missing title
- * @apiError {401} Invalid or missing Token
- * @apiError {403} Invalid or missing Authorization
- * @apiError {500} Server error
+ * @apiError (400 : Invalid or missing title) {String} Invalid or missing title
+ * @apiError (401 : Invalid or missing Token) {String} Invalid or missing Token
+ * @apiError (403 : Invalid or missing Authorization) {String} Invalid or missing Authorization
+ * @apiError (500 : Server error) {String} server error - contact support
  */
 
 booksRouter.get('/title', (request: Request, response: Response) => {
@@ -582,9 +583,11 @@ booksRouter.get('/title', (request: Request, response: Response) => {
  * @apiParam {String} image_url URL of the book's image
  * @apiParam {String} image_small_url URL of the small-sized book's image
  *
- * @apiSuccess {String} message Success message
- * @apiError {400} Invalid request parameters
- * @apiError {500} Server error
+ * @apiSuccess (201: Book Added) {String} message Success message
+ * @apiError (400: Invalid Request Parameters) {String} Invalid request parameters
+ * @apiError (401 : Invalid or missing Token) {String} Invalid or missing Token
+ * @apiError (403 : Invalid or missing Authorization) {String} Invalid or missing Authorization
+ * @apiError (500: Server Error) {String} server error - contact support
  */
 
 
