@@ -274,7 +274,7 @@ booksRouter.get('/ISBN', (req: Request, res: Response) => {
 });
 
 /**
- * @api {get} /rating Retrieve books by rating
+ * @api {get} /books/rating Retrieve books by rating
  * @apiName GetBooksByRating
  * @apiGroup Books
  *
@@ -321,7 +321,7 @@ const validRating = (rating) => {
 };
 
 /**
- * @api {get} /pub_year Retrieve book by Publication Year
+ * @api {get} /books/pub_year Retrieve book by Publication Year
  * @apiName GetBooksByPublicationYear
  *
  * @apiGroup Books
@@ -375,7 +375,7 @@ const isValidYear = (year) => {
 };
 
 /**
- * @api {delete} /delete Delete one book by ISBN13
+ * @api {delete} /books/delete Delete one book by ISBN13
  * @apiName DeleteBookByISBN
  *
  * @apiGroup Books
@@ -425,7 +425,7 @@ booksRouter.delete('/delete', (req: Request, res: Response) => {
 });
 
 /**
- * @api {delete} /multiple_delete Delete multiple books by ISBN13
+ * @api {delete} /books/multiple_delete Delete multiple books by ISBN13
  * @apiName DeleteMultipleBooks
  *
  * @apiGroup Books
