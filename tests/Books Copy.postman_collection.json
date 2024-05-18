@@ -1,0 +1,400 @@
+{
+	"info": {
+		"_postman_id": "aad1bea4-5396-4c9b-84eb-a936cd7050f0",
+		"name": "Books Copy",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33855065"
+	},
+	"item": [
+		{
+			"name": "Get By ISBN Tests",
+			"item": [
+				{
+					"name": "Intended use",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"//Code is functioning\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"//Get By ISBN works when used as intended\r",
+									"pm.test(\"The response has all attributes when valid input\", () => {\r",
+									"    const responseJson = pm.response.json();\r",
+									"    pm.expect(responseJson.books).to.eql([{\"isbn13\":\"9780312651210\",\"authors\":\"Conn Iggulden\",\"publication\":2005,\"original_title\":\"George\",\"title\":\"The Field of Swords (Emperor, #3)\",\"ratings\":{\"average\":4.26,\"count\":9293,\"rating_1\":50,\"rating_2\":173,\"rating_3\":1397,\"rating_4\":4345,\"rating_5\":4708},\"icons\":{\"large\":\"https://s.gr-assets.com/assets/nophoto/book/111x148-bcc042a9c91a29c1d680899eff700a03.png\",\"small\":\"https://s.gr-assets.com/assets/nophoto/book/50x75-a91bf249278a81aabab721ef782c4a74.png\"}}]);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"/**\r",
+									" * The book with the ISBN 9780312651210 has the following attribute values:\r",
+									" * 9334,9780312651210,Conn Iggulden,2005,George,\"The Field of Swords (Emperor, #3)\",4.26,9293,50,173,1397,4345,4708,https://s.gr-assets.com/assets/nophoto/book/111x148-bcc042a9c91a29c1d680899eff700a03.png,https://s.gr-assets.com/assets/nophoto/book/50x75-a91bf249278a81aabab721ef782c4a74.png\r",
+									" */\r",
+									"pm.collectionVariables.set(\"theISBN\", 9780312651210);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4000/books/ISBN?isbn={{theISBN}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"books",
+								"ISBN"
+							],
+							"query": [
+								{
+									"key": "isbn",
+									"value": "{{theISBN}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Invalid ISBN 1",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"/**\r",
+									" * Invalid ISBN as it has far fewer than 13 digits.\r",
+									" */\r",
+									"pm.collectionVariables.set(\"theISBN\", 9);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"//Code is functioning\r",
+									"pm.test(\"Status code is 400\", function () {\r",
+									"  pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"//Get By ISBN throws error and returns 400 when invalid ISBN\r",
+									"pm.test(\"Error thrown\", () => {\r",
+									"    const responseJson = pm.response.json();\r",
+									"    pm.expect(responseJson.message).to.eql(\"Invalid or missing ISBN - please refer to documentation\");\r",
+									"    //pm.expect(responseJson).to.be.a('string');\r",
+									"    //pm.expect(responseJson).to.have.lengthOf(13);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:4000/books/ISBN?isbn={{theISBN}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"books",
+								"ISBN"
+							],
+							"query": [
+								{
+									"key": "isbn",
+									"value": "{{theISBN}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Invalid ISBN 2",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"/**\r",
+									" * Invalid ISBN as it has far greater than 13 digits.\r",
+									" */\r",
+									"pm.collectionVariables.set(\"theISBN\", 9090909090909809890);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"//Code is functioning\r",
+									"pm.test(\"Status code is 400\", function () {\r",
+									"  pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"//Get By ISBN throws error and returns 400 when invalid ISBN\r",
+									"pm.test(\"Error Thrown\", () => {\r",
+									"    const responseJson = pm.response.json();\r",
+									"    pm.expect(responseJson.message).to.eql(\"Invalid or missing ISBN - please refer to documentation\");\r",
+									"    //pm.expect(responseJson).to.be.a('string');\r",
+									"    //pm.expect(responseJson).to.have.lengthOf(13);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:4000/books/ISBN?isbn={{theISBN}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"books",
+								"ISBN"
+							],
+							"query": [
+								{
+									"key": "isbn",
+									"value": "{{theISBN}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "No Token Provided",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"/**\r",
+									" * No token provided.\r",
+									" */\r",
+									"pm.collectionVariables.set(\"theISBN\", '');"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"//Code is functioning.\r",
+									"pm.test(\"Status code is 400\", function () {\r",
+									"  pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"//Get By ISBN throws error and returns 400 when no token provided.\r",
+									"pm.test(\"Error thrown\", () => {\r",
+									"    const responseJson = pm.response.json();\r",
+									"    pm.expect(responseJson.message).to.eql(\"Invalid or missing ISBN - please refer to documentation\");\r",
+									"    //pm.expect(responseJson).to.be.a('string');\r",
+									"    //pm.expect(responseJson).to.have.lengthOf(13);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:4000/books/ISBN?isbn={{theISBN}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"books",
+								"ISBN"
+							],
+							"query": [
+								{
+									"key": "isbn",
+									"value": "{{theISBN}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Delete by ISBN",
+			"item": [
+				{
+					"name": "Works when used as intended",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"//Code is functioning\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"//Valid ISBN is deleted\r",
+									"pm.test(\"Number of rows deleted = 0\", () => {\r",
+									"    const responseJson = pm.response.json();\r",
+									"    pm.expect(responseJson.numDeleted).to.eql(0);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "//Valid ISBN that dosen't exist in the DB so the DB isnt altered.\r\n{\"isbn13\" : \"1234567890123\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4000/books/delete",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"books",
+								"delete"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "No Token Provided",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"//Code is functioning\r",
+									"pm.test(\"Status code is 400\", function () {\r",
+									"  pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"//Delete By ISBN throws error and returns 400 when no token.\r",
+									"pm.test(\"Error thrown\", () => {\r",
+									"    const responseJson = pm.response.json();\r",
+									"    pm.expect(responseJson.message).to.eql(\"Invalid request body - please refer to documentation\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "//invalid ISBN.\r\n{\"isbn13\" : \"\"}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:4000/books/delete",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "4000",
+							"path": [
+								"books",
+								"delete"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "jwt_signed",
+			"value": ""
+		},
+		{
+			"key": "theISBN",
+			"value": ""
+		}
+	]
+}
