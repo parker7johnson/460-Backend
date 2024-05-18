@@ -1,7 +1,7 @@
 {
-    "name": "TCSS 460 BE Phase 2",
+    "name": "Group 2 TCSS 460 Rest Web API",
     "version": "0.1.0",
-    "description": "TCSS 460 Second Node/Express Rest Web API, includes DB and Auth examples",
+    "description": "API Documentation for Our Books API (Group 2).\nAuthored by: Ryan Wicklund, Minh Vu, Maliha Hossain, and Parker Johnson",
     "title": "TCSS 460 Rest Web API",
     "url": "localhost:4000",
     "order": [
